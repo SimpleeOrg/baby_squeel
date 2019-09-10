@@ -23,4 +23,10 @@ describe BabySqueel::Operators::Grouping do
     subject   { attribute.eq(nil) | attribute.eq(1) }
     specify   { is_expected.to produce_sql sql }
   end
+
+  describe '#-@' do
+    let(:sql) { 'NOT ("posts"."id" IS NULL)' }
+    subject   { -attribute.eq(nil) }
+    specify   { is_expected.to produce_sql sql }
+  end
 end
