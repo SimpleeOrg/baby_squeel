@@ -57,6 +57,8 @@ module BabySqueel
         @table.association(name)
       when :column, :attribute
         @table[name]
+      when :fuzzy_attribute
+        Nodes::FuzzyAttribute.new(nil, name)
       end
     end
 
@@ -71,7 +73,7 @@ module BabySqueel
         @table._scope.column_names.include?(name.to_s)
       when :association
         !@table._scope.reflect_on_association(name).nil?
-      when :function, :attribute
+      when :function, :attribute, :fuzzy_attribute
         true
       end
     end
@@ -82,7 +84,7 @@ module BabySqueel
       case strategy
       when :function
         !args.empty?
-      when :column, :attribute, :association
+      when :column, :attribute, :association, :fuzzy_attribute
         args.empty?
       end
     end

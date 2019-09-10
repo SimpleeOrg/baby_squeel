@@ -6,7 +6,8 @@ module BabySqueel
       def initialize(parent, name)
         @parent = parent
         @name = name.to_s
-        super(parent._table[@name])
+        a_node = @parent.nil? ? ::Arel.sql(::ActiveRecord::Base.connection.quote_column_name(@name)) : @parent._table[@name]
+        super(a_node)
       end
 
       def in(rel)
