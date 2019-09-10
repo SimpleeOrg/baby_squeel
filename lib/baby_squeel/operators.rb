@@ -13,8 +13,8 @@ module BabySqueel
       #    Post.where.has { title.unlike 'something' }
       #
       def arel_alias(operator, arel_name)
-        define_method operator do |other|
-          send(arel_name, other)
+        define_method operator do |*args|
+          send(arel_name, *args)
         end
       end
     end
@@ -54,6 +54,7 @@ module BabySqueel
       extend ArelAliasing
       arel_alias :&, :and
       arel_alias :|, :or
+      arel_alias :-@, :not
     end
 
     module Matching
