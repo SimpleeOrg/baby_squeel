@@ -3,43 +3,51 @@ require 'spec_helper'
 RSpec.describe BabySqueel::Resolver do
   let(:table)       { create_table Post.arel_table }
   let(:dsl)         { create_dsl Post }
+  let(:picture_dsl)       { create_dsl Picture }
   let(:relation)    { create_relation Post }
   let(:association) { create_association Post, :author }
 
   let :valid_cases do
     [
-      [table,       :attribute,   :foo,      []],
-      [relation,    :column,      :title,    []],
-      [relation,    :association, :author,   []],
-      [association, :column,      :name,     []],
-      [association, :association, :posts,    []],
-      [dsl,         :column,      :title,    []],
-      [dsl,         :association, :author,   []],
-      [dsl,         :function,    :coalesce, [1, 2]]
+      [table,       :attribute,               :foo,       []],
+      [relation,    :column,                  :title,     []],
+      [relation,    :association,             :author,    []],
+      [association, :column,                  :name,      []],
+      [association, :association,             :posts,     []],
+      [dsl,         :column,                  :title,     []],
+      [dsl,         :association,             :author,    []],
+      [dsl,         :function,                :coalesce,  [1, 2]],
+      [picture_dsl, :polymorphic_association, :imageable, [Post]]
     ]
   end
 
   let :wrong_args_cases do
     [
-      [table,       :attribute,   :foo,      [1]],
-      [relation,    :column,      :title,    [1]],
-      [relation,    :association, :author,   [1]],
-      [association, :column,      :name,     [1]],
-      [association, :association, :posts,    [1]],
-      [dsl,         :column,      :title,    [1]],
-      [dsl,         :association, :author,   [1]],
-      [dsl,         :function,    :coalesce, []]
+      [table,       :attribute,               :foo,       [1]],
+      [relation,    :column,                  :title,     [1]],
+      [relation,    :association,             :author,    [1]],
+      [association, :column,                  :name,      [1]],
+      [association, :association,             :posts,     [1]],
+      [dsl,         :column,                  :title,     [1]],
+      [dsl,         :association,             :author,    [1]],
+      [dsl,         :function,                :coalesce,  []],
+      [picture_dsl, :polymorphic_association, :imageable, []],
+      [picture_dsl, :polymorphic_association, :imageable, [Post, 1]],
+      [picture_dsl, :polymorphic_association, :imageable, [1]],
+      [picture_dsl, :polymorphic_association, :imageable, [Class.new]]
     ]
   end
 
   let :invalid_name_cases do
     [
-      [relation,    :column,      :missing,  []],
-      [relation,    :association, :missing,  []],
-      [association, :column,      :missing,  []],
-      [association, :association, :missing,  []],
-      [dsl,         :column,      :missing,  []],
-      [dsl,         :association, :missing,  []]
+      [relation,    :column,                  :missing,  []],
+      [relation,    :association,             :missing,  []],
+      [association, :column,                  :missing,  []],
+      [association, :association,             :missing,  []],
+      [dsl,         :column,                  :missing,  []],
+      [dsl,         :association,             :missing,  []],
+      [picture_dsl, :polymorphic_association, :missing,  [Post]],
+      [picture_dsl, :polymorphic_association, :comment,  [Comment]]
     ]
   end
 

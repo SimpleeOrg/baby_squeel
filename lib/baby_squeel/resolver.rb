@@ -57,6 +57,9 @@ module BabySqueel
         @table.association(name)
       when :column, :attribute
         @table[name]
+      when :polymorphic_association
+        association = @table.association(name)
+        association.of(args.first)
       end
     end
 
@@ -73,6 +76,9 @@ module BabySqueel
         !@table._scope.reflect_on_association(name).nil?
       when :function, :attribute
         true
+      when :polymorphic_association
+        reflection = @table._scope.reflect_on_association(name)
+        reflection && reflection.polymorphic?
       end
     end
 
@@ -84,6 +90,8 @@ module BabySqueel
         !args.empty?
       when :column, :attribute, :association
         args.empty?
+      when :polymorphic_association
+        args.length == 1 && args.first.is_a?(Class) && args.first < ::ActiveRecord::Base
       end
     end
 

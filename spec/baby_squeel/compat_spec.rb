@@ -22,6 +22,17 @@ describe 'BabySqueel::Compat::DSL', :compat do
       expect(values).to eq([nil, 'test'])
     end
   end
+
+  describe '#evaluate' do
+    it 'resolves polymorphic associations using shorthand syntax' do
+      resolution = nil
+      dsl.evaluate { resolution = pictures.imageable(Post) }
+      expect(resolution).to be_a(BabySqueel::Association)
+      expect(resolution._scope).to eq(Post)
+      expect(resolution._table).to eq(Post.arel_table)
+      expect(resolution._polymorphic_klass).to eq(Post)
+    end
+  end
 end
 
 describe 'BabySqueel::Compat::QueryMethods', :compat do

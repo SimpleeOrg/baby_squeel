@@ -5,6 +5,9 @@ module BabySqueel
       class ::BabySqueel::DSL
         prepend Compat::DSL
       end
+      class ::BabySqueel::Relation
+        prepend Compat::Relation
+      end
       class ::ActiveRecord::Base
         class << self
           prepend QueryMethods
@@ -76,6 +79,20 @@ module BabySqueel
       def evaluate(&block)
         @caller = block.binding.eval('self')
         super
+      end
+
+      private
+
+      def resolver
+        @resolver ||= BabySqueel::Resolver.new(self, [:polymorphic_association, :function, :column, :association])
+      end
+    end
+
+    module Relation
+      private
+
+      def resolver
+        @resolver ||= Resolver.new(self, [:polymorphic_association, :column, :association])
       end
     end
 
