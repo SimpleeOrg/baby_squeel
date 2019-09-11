@@ -59,6 +59,9 @@ module BabySqueel
         @table[name]
       when :table
         Table.new(Arel::Table.new(name))
+      when :polymorphic_association
+        association = @table.association(name)
+        association.of(args.first)
       end
     end
 
@@ -75,6 +78,9 @@ module BabySqueel
         !@table._scope.reflect_on_association(name).nil?
       when :function, :attribute, :table
         true
+      when :polymorphic_association
+        reflection = @table._scope.reflect_on_association(name)
+        reflection && reflection.polymorphic?
       end
     end
 
@@ -86,6 +92,8 @@ module BabySqueel
         !args.empty?
       when :column, :attribute, :association, :table
         args.empty?
+      when :polymorphic_association
+        args.length == 1
       end
     end
 
