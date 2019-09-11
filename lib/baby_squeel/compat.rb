@@ -68,7 +68,7 @@ module BabySqueel
       private
 
       def resolver
-        @resolver ||= BabySqueel::Resolver.new(self, [:function, :column, :association, :fuzzy_attribute])
+        @resolver ||= BabySqueel::Resolver.new(self, [:polymorphic_association, :function, :column, :association, :fuzzy_attribute])
       end
     end
 

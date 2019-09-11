@@ -59,6 +59,9 @@ module BabySqueel
         @table[name]
       when :fuzzy_attribute
         Nodes::FuzzyAttribute.new(nil, name)
+      when :polymorphic_association
+        association = @table.association(name)
+        association.of(args.first)
       end
     end
 
@@ -75,6 +78,9 @@ module BabySqueel
         !@table._scope.reflect_on_association(name).nil?
       when :function, :attribute, :fuzzy_attribute
         true
+      when :polymorphic_association
+        reflection = @table._scope.reflect_on_association(name)
+        reflection && reflection.polymorphic?
       end
     end
 
@@ -86,6 +92,8 @@ module BabySqueel
         !args.empty?
       when :column, :attribute, :association, :fuzzy_attribute
         args.empty?
+      when :polymorphic_association
+        args.length == 1
       end
     end
 
