@@ -1,11 +1,24 @@
 module BabySqueel
   module Compat
+    # ruby won't let us reopen classes in method bodies so do it here.
+    PATCH_CLASSES_PROC = Proc.new do
+      class ::BabySqueel::DSL
+        prepend Compat::DSL
+      end
+      class ::ActiveRecord::Base
+        class << self
+          prepend QueryMethods
+        end
+      end
+      class ::ActiveRecord::Relation
+        prepend QueryMethods
+      end
+    end
+
     # Monkey-patches BabySqueel and ActiveRecord
     # in order to behave more like Squeel
     def self.enable!
-      BabySqueel::DSL.prepend BabySqueel::Compat::DSL
-      ::ActiveRecord::Base.singleton_class.prepend QueryMethods
-      ::ActiveRecord::Relation.prepend QueryMethods
+      PATCH_CLASSES_PROC.call
     end
 
     class KeyPath

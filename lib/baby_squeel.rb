@@ -43,7 +43,11 @@ end
 
 ActiveSupport.on_load :active_record do
   ::ActiveRecord::Base.extend BabySqueel::ActiveRecord::Base
-  ::ActiveRecord::Relation.prepend BabySqueel::ActiveRecord::QueryMethods
-  ::ActiveRecord::Relation.prepend BabySqueel::ActiveRecord::Calculations
-  ::ActiveRecord::QueryMethods::WhereChain.prepend BabySqueel::ActiveRecord::WhereChain
+  class ::ActiveRecord::Relation
+    prepend BabySqueel::ActiveRecord::QueryMethods
+    prepend BabySqueel::ActiveRecord::Calculations
+  end
+  class ::ActiveRecord::QueryMethods::WhereChain
+    prepend BabySqueel::ActiveRecord::WhereChain
+  end
 end
