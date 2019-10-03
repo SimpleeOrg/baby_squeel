@@ -25,6 +25,8 @@ module BabySqueel
       arel_alias :>, :gt
       arel_alias :<=, :lteq
       arel_alias :>=, :gteq
+      arel_alias :>>, :in
+      arel_alias :<<, :not_in
     end
 
     module Equality
