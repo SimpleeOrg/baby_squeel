@@ -32,4 +32,15 @@ describe BabySqueel::Operators::Comparison do
     subject { attribute >= 1 }
     specify { is_expected.to produce_sql '"posts"."id" >= 1' }
   end
+
+  describe '#>>' do
+    subject { attribute >> [1, 2] }
+    specify { is_expected.to produce_sql '"posts"."id" IN (1, 2)' }
+  end
+
+  describe '#<<' do
+    subject { attribute << [1, 2] }
+    specify { is_expected.to produce_sql '"posts"."id" NOT IN (1, 2)' }
+  end
+
 end
