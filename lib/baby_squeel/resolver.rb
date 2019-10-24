@@ -57,8 +57,8 @@ module BabySqueel
         @table.association(name)
       when :column, :attribute
         @table[name]
-      when :table
-        Table.new(Arel::Table.new(name))
+      when :fuzzy_attribute
+        Nodes::FuzzyAttribute.new(nil, name)
       when :polymorphic_association
         association = @table.association(name)
         association.of(args.first)
@@ -76,7 +76,7 @@ module BabySqueel
         @table._scope.column_names.include?(name.to_s)
       when :association
         !@table._scope.reflect_on_association(name).nil?
-      when :function, :attribute, :table
+      when :function, :attribute, :fuzzy_attribute
         true
       when :polymorphic_association
         reflection = @table._scope.reflect_on_association(name)
@@ -90,7 +90,7 @@ module BabySqueel
       case strategy
       when :function
         !args.empty?
-      when :column, :attribute, :association, :table
+      when :column, :attribute, :association, :fuzzy_attribute
         args.empty?
       when :polymorphic_association
         args.length == 1

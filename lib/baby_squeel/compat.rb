@@ -68,7 +68,7 @@ module BabySqueel
       private
 
       def resolver
-        @resolver ||= BabySqueel::Resolver.new(self, [:polymorphic_association, :function, :column, :association, :table])
+        @resolver ||= BabySqueel::Resolver.new(self, [:polymorphic_association, :function, :column, :association, :fuzzy_attribute])
       end
     end
 
@@ -167,6 +167,22 @@ module BabySqueel
         else
           super
         end
+      end
+    end
+  end
+
+  class Nodes::FuzzyAttribute < Nodes::Attribute
+    private
+
+    def method_missing(name, *args, &block)
+      if args.empty?
+        begin
+          super
+        rescue NoMethodError => e
+          Nodes::FuzzyAttribute.new(Table.new(::Arel::Table.new(@name)), name)
+        end
+      else
+        super
       end
     end
   end
