@@ -35,6 +35,14 @@ describe BabySqueel::Nodes::Attribute do
       EOSQL
     end
 
+    it 'accepts an ActiveRecord relation without any selected values and uses the primary_key as selected value' do
+      relation = Post.all
+
+      expect(attribute.in(relation)).to produce_sql(<<-EOSQL)
+        "posts"."id" IN (SELECT "posts"."id" FROM "posts")
+      EOSQL
+    end
+
     it 'returns a BabySqueel node' do
       relation = Post.select(:id)
       expect(attribute.in(relation)).to respond_to(:_arel)
@@ -63,6 +71,14 @@ describe BabySqueel::Nodes::Attribute do
 
       expect(attribute.not_in(relation)).to produce_sql(<<-EOSQL)
         "posts"."id" NOT IN (SELECT "posts"."id" FROM "posts" LIMIT 3)
+      EOSQL
+    end
+
+    it 'accepts an ActiveRecord relation without any selected values and uses the primary_key as selected value' do
+      relation = Post.all
+
+      expect(attribute.not_in(relation)).to produce_sql(<<-EOSQL)
+        "posts"."id" NOT IN (SELECT "posts"."id" FROM "posts")
       EOSQL
     end
   end
