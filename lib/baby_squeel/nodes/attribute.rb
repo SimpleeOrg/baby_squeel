@@ -47,6 +47,7 @@ module BabySqueel
           other.extending_values -= [::ActiveRecord::NullRelation]
           sanitize_relation rel.unscoped.merge(other)
         else
+          rel = rel.spawn.select(rel.klass.primary_key) if rel.select_values.empty?
           Arel.sql rel.to_sql
         end
       end
