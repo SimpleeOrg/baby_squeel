@@ -48,6 +48,9 @@ describe BabySqueel::Association do
       end
     else
       it 'throws not supported' do
+        if ENV['COMPAT']
+          skip "This isn't supported in Squeel Compatibility mode"
+        end
         expect {
           association == 'foo'
         }.to raise_error(BabySqueel::AssociationComparisonNotSupportedError)
@@ -71,6 +74,9 @@ describe BabySqueel::Association do
       end
     else
       it 'throws not supported' do
+        if ENV['COMPAT']
+          skip "This isn't supported in Squeel Compatibility mode"
+        end
         expect {
           association != 'foo'
         }.to raise_error(BabySqueel::AssociationComparisonNotSupportedError)

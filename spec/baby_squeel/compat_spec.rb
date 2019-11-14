@@ -32,6 +32,34 @@ describe 'BabySqueel::Compat::DSL', :compat do
       expect(resolution._table).to eq(Post.arel_table)
       expect(resolution._polymorphic_klass).to eq(Post)
     end
+
+    if ActiveRecord::VERSION::MAJOR < 5
+      describe 'association comparison' do
+        let(:an_author) { Author.create!(name: 'George Martin') }
+        let(:a_post) { Post.create!(title: 'A Song of Ice and Fire', author: an_author) }
+
+        it 'generates the correct SQL for regular associations' do
+          expect(dsl.evaluate { author == my{an_author} }).to produce_sql("\"posts\".\"author_id\" = #{an_author.id}")
+          expect(dsl.evaluate { author != my{an_author} }).to produce_sql("NOT (\"posts\".\"author_id\" = #{an_author.id})")
+          expect(dsl.evaluate { author == nil }).to produce_sql('"posts"."author_id" IS NULL')
+        end
+
+        it 'generates the correct SQL for polymorphic associations' do
+          expect(dsl.evaluate { pictures.imageable == my{a_post} }).to produce_sql("\"pictures\".\"imageable_id\" = #{a_post.id} AND \"pictures\".\"imageable_type\" = 'Post'")
+          expect(dsl.evaluate { pictures.imageable != my{a_post} }).to produce_sql("NOT (\"pictures\".\"imageable_id\" = #{a_post.id} AND \"pictures\".\"imageable_type\" = 'Post')")
+          expect(dsl.evaluate { pictures.imageable == nil }).to produce_sql('"pictures"."imageable_id" IS NULL')
+        end
+
+        it 'throws an error for invalid comparisons' do
+          expect {
+            dsl.evaluate { author == 'bazinga' }
+          }.to raise_error(BabySqueel::AssociationComparisonError)
+          expect {
+            dsl.evaluate { author != 0 }
+          }.to raise_error(BabySqueel::AssociationComparisonError)
+        end
+      end
+    end
   end
 end
 

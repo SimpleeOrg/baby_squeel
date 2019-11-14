@@ -8,6 +8,9 @@ module BabySqueel
       class ::BabySqueel::Relation
         prepend Compat::Relation
       end
+      class ::BabySqueel::Association
+        prepend Compat::Association
+      end
       class ::ActiveRecord::Base
         class << self
           prepend QueryMethods
@@ -93,6 +96,42 @@ module BabySqueel
 
       def resolver
         @resolver ||= Resolver.new(self, [:polymorphic_association, :column, :association])
+      end
+    end
+
+    module Association
+      # implement association comparison for rails versions < 5 instead of throwing error
+      if ::ActiveRecord::VERSION::MAJOR < 5
+        def ==(other)
+          if other.is_a?(::ActiveRecord::Base) || other.nil?
+            Nodes.wrap build_association_equality_conditions(other)
+          else
+            raise AssociationComparisonError.new(_reflection.name, other)
+          end
+        end
+
+        def !=(other)
+          if other.is_a?(::ActiveRecord::Base) || other.nil?
+            Nodes.wrap build_association_equality_conditions(other).not
+          else
+            raise AssociationComparisonError.new(_reflection.name, other)
+          end
+        end
+      end
+
+      private
+
+      def build_association_equality_conditions(other)
+        return @parent.__send__(_reflection.foreign_key).eq(other) if other.nil?
+        conditions = [
+          @parent.__send__(_reflection.foreign_key).eq(other.id)
+        ]
+        if _reflection.polymorphic?
+          conditions << [
+            @parent.__send__(_reflection.foreign_type).eq(other.class.base_class.name)
+          ]
+        end
+        conditions.inject(:and)
       end
     end
 
