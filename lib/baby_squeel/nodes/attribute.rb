@@ -13,6 +13,9 @@ module BabySqueel
       def in(rel)
         if rel.is_a? ::ActiveRecord::Relation
           Nodes.wrap ::Arel::Nodes::In.new(self, sanitize_relation(rel))
+        elsif rel.is_a?(Array) && rel.include?(nil)
+          rel = rel.compact
+          rel.empty? ? self.eq(nil) : self.in(rel).or(self.eq(nil))
         else
           super
         end
@@ -21,6 +24,9 @@ module BabySqueel
       def not_in(rel)
         if rel.is_a? ::ActiveRecord::Relation
           Nodes.wrap ::Arel::Nodes::NotIn.new(self, sanitize_relation(rel))
+        elsif rel.is_a?(Array) && rel.include?(nil)
+          rel = rel.compact
+          rel.empty? ? self.not_eq(nil) : self.not_in(rel).and(self.not_eq(nil))
         else
           super
         end
