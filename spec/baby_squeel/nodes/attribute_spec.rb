@@ -43,6 +43,14 @@ describe BabySqueel::Nodes::Attribute do
       EOSQL
     end
 
+    it 'handles array containing only nils correctly' do
+      expect(attribute.in([nil, nil])).to produce_sql('"posts"."id" IS NULL')
+    end
+
+    it 'handles array containing nils and other values correctly' do
+      expect(attribute.in([1, nil, nil])).to produce_sql('("posts"."id" IN (1) OR "posts"."id" IS NULL)')
+    end
+
     it 'returns a BabySqueel node' do
       relation = Post.select(:id)
       expect(attribute.in(relation)).to respond_to(:_arel)
@@ -80,6 +88,14 @@ describe BabySqueel::Nodes::Attribute do
       expect(attribute.not_in(relation)).to produce_sql(<<-EOSQL)
         "posts"."id" NOT IN (SELECT "posts"."id" FROM "posts")
       EOSQL
+    end
+
+    it 'handles array containing only nils correctly' do
+      expect(attribute.not_in([nil, nil])).to produce_sql('"posts"."id" IS NOT NULL')
+    end
+
+    it 'handles array containing nils and other values correctly' do
+      expect(attribute.not_in([1, nil, nil])).to produce_sql('"posts"."id" NOT IN (1) AND "posts"."id" IS NOT NULL')
     end
   end
 end
