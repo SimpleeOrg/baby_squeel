@@ -5,6 +5,9 @@ module BabySqueel
       class ::BabySqueel::DSL
         prepend Compat::DSL
       end
+      class ::BabySqueel::Association
+        prepend Compat::Association
+      end
       class ::ActiveRecord::Base
         class << self
           prepend QueryMethods
@@ -82,6 +85,39 @@ module BabySqueel
 
       def resolver
         @resolver ||= BabySqueel::Resolver.new(self, [:polymorphic_association, :function, :column, :association, :fuzzy_attribute])
+      end
+    end
+
+    module Association
+      def ==(other)
+        if other.is_a?(::ActiveRecord::Base) || other.nil?
+          Nodes.wrap build_association_equality_conditions(other)
+        else
+          super
+        end
+      end
+
+      def !=(other)
+        if other.is_a?(::ActiveRecord::Base) || other.nil?
+          Nodes.wrap build_association_equality_conditions(other).not
+        else
+          super
+        end
+      end
+
+      private
+
+      def build_association_equality_conditions(other)
+        return @parent.__send__(_reflection.foreign_key).eq(other) if other.nil?
+        conditions = [
+          @parent.__send__(_reflection.foreign_key).eq(other.id)
+        ]
+        if _reflection.polymorphic?
+          conditions << [
+            @parent.__send__(_reflection.foreign_type).eq(other.class.base_class.name)
+          ]
+        end
+        conditions.inject(:and)
       end
     end
 
