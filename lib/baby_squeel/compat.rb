@@ -81,7 +81,14 @@ module BabySqueel
       # Remember the original binding of the block
       def evaluate(&block)
         @caller = block.binding.eval('self')
-        super
+        node = super
+        if node.is_a?(TrueClass)
+          `1`
+        elsif node.is_a?(FalseClass)
+          `0`
+        else
+          node
+        end
       end
 
       private

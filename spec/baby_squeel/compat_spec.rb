@@ -60,6 +60,11 @@ describe 'BabySqueel::Compat::DSL', :compat do
         end
       end
     end
+
+    it 'resolves boolean values' do
+      expect(dsl.evaluate { true }).to produce_sql('1')
+      expect(dsl.evaluate { false }).to produce_sql('0')
+    end
   end
 end
 
