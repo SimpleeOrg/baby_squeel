@@ -10,6 +10,7 @@ module BabySqueel
       end
 
       def in(rel)
+        rel = rel.flatten if rel.is_a?(Array)
         if rel.is_a? ::ActiveRecord::Relation
           Nodes.wrap ::Arel::Nodes::In.new(self, sanitize_relation(rel))
         elsif rel.is_a?(Array) && rel.include?(nil)
@@ -21,6 +22,7 @@ module BabySqueel
       end
 
       def not_in(rel)
+        rel = rel.flatten if rel.is_a?(Array)
         if rel.is_a? ::ActiveRecord::Relation
           Nodes.wrap ::Arel::Nodes::NotIn.new(self, sanitize_relation(rel))
         elsif rel.is_a?(Array) && rel.include?(nil)

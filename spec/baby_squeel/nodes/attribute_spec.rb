@@ -51,6 +51,10 @@ describe BabySqueel::Nodes::Attribute do
       expect(attribute.in([1, nil, nil])).to produce_sql('("posts"."id" IN (1) OR "posts"."id" IS NULL)')
     end
 
+    it 'handles nested arrays' do
+      expect(attribute.in([1, [2,3]])).to produce_sql('"posts"."id" IN (1, 2, 3)')
+    end
+
     it 'returns a BabySqueel node' do
       relation = Post.select(:id)
       expect(attribute.in(relation)).to respond_to(:_arel)
@@ -96,6 +100,10 @@ describe BabySqueel::Nodes::Attribute do
 
     it 'handles array containing nils and other values correctly' do
       expect(attribute.not_in([1, nil, nil])).to produce_sql('"posts"."id" NOT IN (1) AND "posts"."id" IS NOT NULL')
+    end
+
+    it 'handles nested arrays' do
+      expect(attribute.not_in([1, [2,3]])).to produce_sql('"posts"."id" NOT IN (1, 2, 3)')
     end
   end
 end
