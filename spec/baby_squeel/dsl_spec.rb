@@ -90,4 +90,18 @@ describe BabySqueel::DSL do
       end
     end
   end
+
+  describe '#exists' do
+    it 'with an empty subquery' do
+      relation = Post.none.select(:id)
+      expect(dsl.exists(relation)).to produce_sql('EXISTS(SELECT "posts"."id" FROM "posts" WHERE (1=0))')
+    end
+  end
+
+  describe '#not_exists' do
+    it 'with an empty subquery' do
+      relation = Post.none.select(:id)
+      expect(dsl.not_exists(relation)).to produce_sql('NOT EXISTS(SELECT "posts"."id" FROM "posts" WHERE (1=0))')
+    end
+  end
 end
