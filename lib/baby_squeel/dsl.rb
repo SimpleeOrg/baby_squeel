@@ -59,7 +59,7 @@ module BabySqueel
     #     Post.where.has { exists Post.where(id: 1) }
     #
     def exists(relation)
-      func 'EXISTS', sql(relation.to_sql)
+      func 'EXISTS', sanitize_relation_for_func(relation)
     end
 
     # Generate a NOT EXISTS subselect from an ActiveRecord::Relation
@@ -72,7 +72,7 @@ module BabySqueel
     #     Post.where.has { not_exists Post.where(id: 1) }
     #
     def not_exists(rel)
-      func 'NOT EXISTS', sql(rel.to_sql)
+      func 'NOT EXISTS', sanitize_relation_for_func(rel)
     end
 
     # See Arel::sql
@@ -89,6 +89,15 @@ module BabySqueel
 
     def resolver
       @resolver ||= Resolver.new(self, [:function, :column, :association])
+    end
+
+    def sanitize_relation_for_func(rel)
+      if rel.is_a?(::ActiveRecord::NullRelation)
+        spawned_rel = rel.spawn
+        spawned_rel.extending_values -= [::ActiveRecord::NullRelation]
+        rel = rel.unscoped.merge(spawned_rel)
+      end
+      sql(rel.to_sql)
     end
   end
 end
