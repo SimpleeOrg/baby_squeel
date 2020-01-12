@@ -51,6 +51,10 @@ describe BabySqueel::DSL do
     it 'constructs a named function' do
       expect(dsl.func(:coalesce, 0, 1)).to produce_sql('coalesce(0, 1)')
     end
+
+    it 'accepts nil as arguments' do
+      expect(dsl.func(:ifnull, 1, nil)).to produce_sql('ifnull(1, NULL)')
+    end
   end
 
   describe '#method_missing' do

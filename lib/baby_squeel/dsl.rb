@@ -46,6 +46,7 @@ module BabySqueel
     #     #=> SELECT COALESCE("posts"."id", 1) FROM "posts"
     #
     def func(name, *args)
+      args.map! { |arg| arg.nil? ? sql('NULL') : arg }
       Nodes.wrap Arel::Nodes::NamedFunction.new(name.to_s, args)
     end
 
